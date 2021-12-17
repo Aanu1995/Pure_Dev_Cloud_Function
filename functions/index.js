@@ -297,10 +297,19 @@ exports.createChat = functions.firestore
 
         const members = connData["members"];
         var date = new Date().toISOString();
+        const senderId = result["senderId"];
+        // remove the sender from the members
+        var myIndex = members.indexOf(senderId);
+        members.splice(myIndex, 1);
+        
+        // update receipts
         var receiptData = {};
         for (const id of members){
-          receiptData[`${id}`] = {"unreadCount": 0, "lastSeen": date}
+          receiptData[`${id}`] = {"unreadCount": 1, "lastSeen": date};
         }
+        // update the sender last seen
+        const updateDate = result["updateDate"];
+        receiptData[`${senderId}`] = {"unreadCount": 0, "lastSeen":  updateDate};
         await firestore.collection("Receipts").doc(chatId).set(receiptData);
        
       } else {
@@ -308,7 +317,7 @@ exports.createChat = functions.firestore
         var date = new Date().toISOString();
         var receiptData = {};
         for (const id of members){
-          receiptData[`${id}`] = {"unreadCount": 0, "lastSeen": date}
+          receiptData[`${id}`] = {"unreadCount": 0, "lastSeen": date};
         }
         await firestore.collection("Receipts").doc(chatId).set(receiptData);
       }
@@ -331,29 +340,32 @@ exports.createChat = functions.firestore
 
       const doc = await firestore.collection("Chats").doc(chatId).get();
       const chatData = doc.data();
-      const members = chatData["members"];
 
-      // remove the sender from the members
-      var myIndex = members.indexOf(senderId);
-      members.splice(myIndex, 1);
-      
-      // update receipts
-      var receiptData = {};
-      for (const id of members){
-        receiptData[`${id}.unreadCount`] = admin.firestore.FieldValue.increment(1);
-      }
-      // update the sender last seen
-      receiptData[`${senderId}.lastSeen`] = message["sentDate"];
-
-       // update chat for latest message
-       const data = {
+      // update chat for latest message
+      const data = {
         'lastMessage': message["text"],
         'senderId': message['senderId'],
         'updateDate': message["sentDate"],
       }
 
-       firestore.collection("Chats").doc(chatId).set(data, {merge: true });
-       await firestore.collection("Receipts").doc(chatId).update(receiptData);
+      firestore.collection("Chats").doc(chatId).set(data, {merge: true });
+
+      if(chatData["members"] != null){
+        const members = chatData["members"];
+        // remove the sender from the members
+        var myIndex = members.indexOf(senderId);
+        members.splice(myIndex, 1);
+        
+        // update receipts
+        var receiptData = {};
+        for (const id of members){
+          receiptData[`${id}.unreadCount`] = admin.firestore.FieldValue.increment(1);
+        }
+        // update the sender last seen
+        receiptData[`${senderId}.lastSeen`] = message["sentDate"];
+        await firestore.collection("Receipts").doc(chatId).update(receiptData);
+      }
+       
 
        var chatMsg = message["text"] == ""? "Attachments": message["text"];
        const userDoc = await firestore.collection("Users").doc(senderId).get();

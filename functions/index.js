@@ -294,7 +294,6 @@ exports.createChat = functions.firestore
           'members': connData["members"],
         }
         await firestore.collection("Chats").doc(chatId).update(data);
-        await firestore.collection("Receipts").doc(chatId).set(receiptData);
 
         const members = connData["members"];
         var date = new Date().toISOString();
@@ -363,7 +362,7 @@ exports.createChat = functions.firestore
 
        if(chatData["type"] == "group"){
          var groupName = chatData["groupName"];
-         var newChatMsg = fullName + ":" + chatMsg;
+         var newChatMsg = fullName + ": " + chatMsg;
         sendNotification(chatId, groupName, newChatMsg)
        } else {
         sendNotification(chatId, fullName, chatMsg)

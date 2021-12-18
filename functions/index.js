@@ -5,9 +5,9 @@ const admin = require("firebase-admin");
 admin.initializeApp();
 
 const firestore = admin.firestore();
-const ALGOLIA_APP_ID = "R0547NV5EC";
-const ALGOLIA_ADMIN_KEY = "c2a39e95694ecca02f37ec7bdaa43d69";
-const ALGOLIA_USERS_INDEX_NAME = "Users";
+const ALGOLIA_APP_ID = "";
+const ALGOLIA_ADMIN_KEY = "";
+const ALGOLIA_USERS_INDEX_NAME = "";
 
   /// This section is for Invitation Triggers
 

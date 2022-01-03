@@ -157,7 +157,8 @@ const ALGOLIA_USERS_INDEX_NAME = "Users";
         };
         await firestore.collection("UsersExt").doc(receiverId).update(receiverData);
 
-        await firestore.collection("Chats").doc(connectionId).delete();
+       await firestore.collection("Chats").doc(connectionId).delete();
+       await firestore.collection("Receipts").doc(connectionId).delete();
      
       return console.log(`Counter for invitation increased`);
     } catch (error) {

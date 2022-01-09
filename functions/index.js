@@ -297,7 +297,7 @@ exports.createChat = functions.firestore
         await firestore.collection("Chats").doc(chatId).update(data);
 
         const members = connData["members"];
-        var date = new Date().toISOString();
+        var date = new Date(2021, 1, 1).toISOString();
         const senderId = result["senderId"];
         // remove the sender from the members
         var myIndex = members.indexOf(senderId);
@@ -315,7 +315,7 @@ exports.createChat = functions.firestore
        
       } else {
         const members = result["members"];
-        var date = new Date().toISOString();
+        var date = new Date(2021, 1, 1).toISOString();
         var receiptData = {};
         for (const id of members){
           receiptData[`${id}`] = {"unreadCount": 0, "lastSeen": date};
